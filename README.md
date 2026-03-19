@@ -56,3 +56,8 @@ The final output is designed to feed a BigQuery table and power a [Looker Studio
 * portfolio-level pricing analysis
 * item-level exploration
 * category-level breakdowns
+
+## Next Steps
+
+- Remove keywords when searching on Vinted
+- Apply reranking using visual similarity (`FashionCLIP` + Vector DB)
