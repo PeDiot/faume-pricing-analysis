@@ -4,11 +4,9 @@ MVP to analyze the pricing position of second-hand [Sœur](https://secondhand.so
 
 ## Install
 
-Clone the repository:
-
 ```bash
-git clone <repo_url>
-cd <repo_name>
+git clone https://github.com/PeDiot/faume-pricing-analysis.git
+cd faume-pricing-analysis
 uv sync
 ```
 
@@ -30,11 +28,11 @@ Download the following files into `data/`:
 
 ### 1. Load Faume items
 
-Load raw Sœur items from the Faume API export stored in `items.json`.
+Load raw items from the Faume API export stored in `items.json`.
 
 ### 2. Map Faume items to Vinted catalogs
 
-Map each Faume item to one or more Vinted catalog IDs based on the Faume item type.
+Map each Faume item to one or more Vinted catalog IDs based on the Faume item type, using [`catalog_mapping.json`](mapping/catalog_mapping.json).
 
 ### 3. Retrieve Vinted comparables
 
@@ -43,15 +41,13 @@ Search the Vinted database using `VintedClient`, combining:
 * Vinted catalog IDs
 * the item model provided by Faume as keyword input
 
-This step produces a comparable set of Sœur listings for each Faume item.
+This step produces a comparable set of Vinted listings for each Faume item.
 
 ### 4. Postprocess data for analytics
 
 Postprocess Faume items and Vinted comparables into a flat comparable-level dataset formatted for BigQuery ingestion.
 
-Output:
-
-* `vinted_comparables.jsonl`
+Output: [`vinted_comparables.jsonl`](https://storage.googleapis.com/faume/soeur/vinted_comparables.jsonl)
 
 ## Output
 
