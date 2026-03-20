@@ -20,9 +20,9 @@ mkdir data
 
 Download the following files into `data/`:
 
-* [`items.json`](https://storage.googleapis.com/faume/soeur/items.json) — raw items extracted from the Faume API
-* [`dataset.json`](https://storage.googleapis.com/faume/soeur/dataset.json) — Faume items enriched with Vinted comparables
-* [`vinted_comparables.jsonl`](https://storage.googleapis.com/faume/soeur/vinted_comparables.jsonl) — preprocessed comparable-level dataset ready for BigQuery upload
+* [`items.json`](https://storage.googleapis.com/faume/soeur/items.json): raw items extracted from the Faume API
+* [`dataset.json`](https://storage.googleapis.com/faume/soeur/dataset.json): Faume items + Vinted comparables
+* [`vinted_comparables.jsonl`](https://storage.googleapis.com/faume/soeur/vinted_comparables.jsonl): preprocessed comparable-level dataset ready for BigQuery
 
 ## Workflow
 
@@ -39,7 +39,7 @@ Map each Faume item to one or more Vinted catalog IDs based on the Faume item ty
 Search the Vinted database using `VintedClient`, combining:
 
 * Vinted catalog IDs
-* the item model provided by Faume as keyword input
+* the item model name as keyword input
 
 This step produces a comparable set of Vinted listings for each Faume item.
 
@@ -70,7 +70,7 @@ where `price_vinted_median` is the median price for comparable Vinted items.
 ### Relative Price Difference
 
 ```
-price_diff_rel = price_faume - price_vinted_median / price_vinted_median
+price_diff_rel = (price_faume - price_vinted_median) / price_vinted_median
 ```
 
 #### Interpretation
@@ -93,11 +93,13 @@ confidence_score = 0.6 × n_score + 0.4 × dispersion_score
 
 Scoring rules:
 
-* `n` < 3 → `n_score` = 0
-* 3 <= `n` < 5 → `n_score` = 0.4
-* 5 <= `n` < 10 → `n_score` = 0.7
-* 10 <= `n` < 20 → `n_score` = 0.9
-* `n` >= 20 → `n_score` = 1
+| `n` | `n_score` |
+|---|---:|
+| <3 | 0 |
+| [3, 5) | 0.4 |
+| [5, 10) | 0.7 |
+| [10, 20) | 0.9 |
+| >= 20 | 1 |
 
 #### `dispersion_score`
 
@@ -115,11 +117,13 @@ where:
 
 Scoring rules:
 
-* `dispersion` <= 0.20 → `dispersion_score`= 1
-* 0.20 < `dispersion` <= 0.35 → `dispersion_score` = 0.8
-* 0.35 < `dispersion` <= 0.50 → `dispersion_score` = 0.6
-* 0.50 < `dispersion` <= 0.75 → `dispersion_score` = 0.35
-* `dispersion` > 0.75 → `dispersion_score` = 0.1
+|  `dispersion` | `dispersion_score` |
+|---|---:|
+| <= 0.20 | 1 |
+| (0.20, 0.35] | 0.8 |
+| (0.35, 0.50] | 0.6 |
+| (0.50, 0.75] | 0.35 |
+| > 0.75 | 0.1 |
 
 #### Interpretation
 
@@ -132,5 +136,5 @@ This score is heuristic and meant to provide a simple, interpretable proxy for c
 
 ## Next Steps
 
-- Remove keywords when searching on Vinted
-- Apply reranking using visual similarity (`FashionCLIP` + Vector DB)
+- Only use catalog IDs when searching on Vinted to get more candidates
+- Apply reranking on these candidates using visual similarity + keyword matching (FashionCLIP, BM25, Vector DB)
